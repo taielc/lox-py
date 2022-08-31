@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "lox_py"
+version = "0.1.0"
+description = "Lox lexer in python"
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.12.2"
+black = "^22.1.0"
+isort = "^5.10.1"
+mypy = "^0.940"
+pre-commit = "^2.17.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

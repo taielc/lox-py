@@ -1,0 +1,28 @@
+repos:
+-   repo: local
+    hooks:
+    - id: black
+      name: black
+      entry: poetry run black
+      language: system
+      types: [python]
+      args: [--skip-string-normalization]
+      files: 'src/*'
+    - id: mypy
+      name: mypy
+      entry: poetry run mypy
+      language: system
+      types: [python]
+      files: 'src/*'
+    - id: pylint
+      name: pylint
+      entry: poetry run pylint
+      language: system
+      types: [python]
+      files: 'src/*'
+    - id: isort
+      name: isort
+      entry: poetry run isort -m 3 --trailing-comma
+      language: system
+      types: [python]
+      files: 'src/*'
