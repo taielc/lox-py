@@ -3,12 +3,17 @@ Lox Interpreter base.
 """
 from typing import List
 
+from scanner import Scanner
+from token_ import Token
+
 
 def run(source: str):
     """
     Run Lox source code given.
     """
-    print(source)
+    scanner = Scanner(source)
+    tokens: List[Token] = scanner.scan_tokens()
+    print(tokens)
 
 
 def run_file(path: str):
