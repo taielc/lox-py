@@ -55,8 +55,6 @@ class Scanner:
                 self.add_token(TokenType.PLUS)
             case TokenType.SEMICOLON.value:
                 self.add_token(TokenType.SEMICOLON)
-            case TokenType.SLASH.value:
-                self.add_token(TokenType.SLASH)
             case TokenType.STAR.value:
                 self.add_token(TokenType.STAR)
             # One or two character tokens
@@ -76,8 +74,43 @@ class Scanner:
                 self.add_token(
                     TokenType.GREATER_EQUAL if self.match("=") else TokenType.GREATER
                 )
+            # Slash & Comments
+            case TokenType.SLASH.value:
+                if self.match("/"):
+                    self.comment()
+                else:
+                    self.add_token(TokenType.SLASH)
+            # Whitespace
+            case TokenType.SPACE.value:
+                self.add_token(TokenType.SPACE)
+            case TokenType.TAB.value:
+                self.add_token(TokenType.TAB)
+            case TokenType.CARRIAGE_RETURN.value:
+                self.add_token(TokenType.CARRIAGE_RETURN)
+            case TokenType.NEWLINE.value:
+                self.line += 1
+                self.add_token(TokenType.NEWLINE)
             case _:
                 raise Exception(f"Unexpected character: {char}")
+
+    def comment(self):
+        """
+        Save the comment.
+        """
+        end_char = "\n"
+        while self.peek() != end_char and not self.is_at_end():
+            self.advance()
+        # Skip the '//'
+        comment = self.source[self.start + 2 : self.current]
+        self.add_token(TokenType.COMMENT, value=comment)
+
+    def peek(self) -> str:
+        """
+        Peek at next character in source.
+        """
+        if self.is_at_end():
+            return "\0"
+        return self.source[self.current]
 
     def match(self, expected: str) -> bool:
         """
