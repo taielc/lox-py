@@ -59,8 +59,36 @@ class Scanner:
                 self.add_token(TokenType.SLASH)
             case TokenType.STAR.value:
                 self.add_token(TokenType.STAR)
+            # One or two character tokens
+            case TokenType.BANG.value:
+                self.add_token(
+                    TokenType.BANG_EQUAL if self.match("=") else TokenType.BANG
+                )
+            case TokenType.EQUAL.value:
+                self.add_token(
+                    TokenType.EQUAL_EQUAL if self.match("=") else TokenType.EQUAL
+                )
+            case TokenType.LESS.value:
+                self.add_token(
+                    TokenType.LESS_EQUAL if self.match("=") else TokenType.LESS
+                )
+            case TokenType.GREATER.value:
+                self.add_token(
+                    TokenType.GREATER_EQUAL if self.match("=") else TokenType.GREATER
+                )
             case _:
                 raise Exception(f"Unexpected character: {char}")
+
+    def match(self, expected: str) -> bool:
+        """
+        Check if next character in source matches expected.
+        """
+        if self.is_at_end():
+            return False
+        if self.source[self.current] != expected:
+            return False
+        self.current += 1
+        return True
 
     def add_token(self, token_type: TokenType, value: str = None):
         """
