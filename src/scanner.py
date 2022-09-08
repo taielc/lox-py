@@ -4,8 +4,8 @@ Lox Scanner/Lexer.
 from typing import List
 
 from token_ import Token
-from token_type import TokenType
-from utils import is_digit
+from token_type import KEYWORD_TOKENS, TokenType
+from utils import is_alpha, is_alphanumeric, is_digit
 
 
 class Scanner:
@@ -97,8 +97,22 @@ class Scanner:
                 self.string()
             case _ if is_digit(char):
                 self.number()
+            # Identifiers and keywords
+            case _ if is_alpha(char):
+                self.identifier_or_keyword()
             case _:
                 raise Exception(f"Unexpected character: {char}")
+
+    def identifier_or_keyword(self):
+        """
+        Scan an identifier or keyword.
+        """
+        while is_alphanumeric(self.peek()):
+            self.advance()
+
+        text = self.source[self.start : self.current]
+        token_type = KEYWORD_TOKENS.get(text, TokenType.IDENTIFIER)
+        self.add_token(token_type)
 
     def number(self):
         """

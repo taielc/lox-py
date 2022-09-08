@@ -19,6 +19,26 @@ class _TokenTypeMixIn(Enum):
         return str(self.value)
 
 
+KEYWORDS = [
+    "AND",
+    "CLASS",
+    "ELSE",
+    "FALSE",
+    "FUN",
+    "FOR",
+    "IF",
+    "NIL",
+    "OR",
+    "PRINT",
+    "RETURN",
+    "SUPER",
+    "THIS",
+    "TRUE",
+    "VAR",
+    "WHILE",
+]
+
+
 TokenType = Enum(  # type: ignore[misc]
     "TokenType",
     {
@@ -46,31 +66,16 @@ TokenType = Enum(  # type: ignore[misc]
         "LESS_EQUAL": "<=",
         **{
             kw: kw.lower()
-            for kw in [
-                #
+            for kw in (
                 # Keywords.
-                "AND",
-                "CLASS",
-                "ELSE",
-                "FALSE",
-                "FUN",
-                "FOR",
-                "IF",
-                "NIL",
-                "OR",
-                "PRINT",
-                "RETURN",
-                "SUPER",
-                "THIS",
-                "TRUE",
-                "VAR",
-                "WHILE",
-                #
+                KEYWORDS
                 # Literals.
-                "IDENTIFIER",
-                "STRING",
-                "NUMBER",
-            ]
+                + [
+                    "IDENTIFIER",
+                    "STRING",
+                    "NUMBER",
+                ]
+            )
         },
         # whitespace tokens.
         "SPACE": " ",
@@ -83,3 +88,6 @@ TokenType = Enum(  # type: ignore[misc]
     },
     type=_TokenTypeMixIn,
 )
+
+# keyword tokens dictionary. {keyword: token_type}
+KEYWORD_TOKENS = {kw.lower(): TokenType[kw] for kw in KEYWORDS}
