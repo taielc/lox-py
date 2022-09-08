@@ -5,6 +5,7 @@ from typing import List
 
 from token_ import Token
 from token_type import TokenType
+from utils import is_digit
 
 
 class Scanner:
@@ -90,8 +91,44 @@ class Scanner:
             case TokenType.NEWLINE.value:
                 self.line += 1
                 self.add_token(TokenType.NEWLINE)
+            # Literals
+            case '"':
+                print("String start")
+                self.string()
+            case _ if is_digit(char):
+                self.number()
             case _:
                 raise Exception(f"Unexpected character: {char}")
+
+    def number(self):
+        """
+        Scan a number from source.
+        """
+        while is_digit(self.peek()):
+            self.advance()
+        # Look for a fractional part.
+        if self.peek() == "." and is_digit(self.peek_next()):
+            # Consume the "."
+            self.advance()
+            while is_digit(self.peek()):
+                self.advance()
+        self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
+
+    def string(self):
+        """
+        Scan a string from source.
+        """
+        while self.peek() != '"' and not self.is_at_end():
+            if self.peek() == "\n":
+                self.line += 1
+            self.advance()
+        if self.is_at_end():
+            raise Exception("Unterminated string.")
+        # The closing "
+        self.advance()
+        # Skip the initial and ending "
+        string = self.source[self.start + 1 : self.current - 1]
+        self.add_token(TokenType.STRING, value=string)
 
     def comment(self):
         """
@@ -104,6 +141,14 @@ class Scanner:
         comment = self.source[self.start + 2 : self.current]
         self.add_token(TokenType.COMMENT, value=comment)
 
+    def peek_next(self) -> str:
+        """
+        Peek at next character in source.
+        """
+        if self.current + 1 >= len(self.source):
+            return "\0"
+        return self.source[self.current + 1]
+
     def peek(self) -> str:
         """
         Peek at next character in source.
@@ -111,6 +156,12 @@ class Scanner:
         if self.is_at_end():
             return "\0"
         return self.source[self.current]
+
+    def peek_prev(self) -> str:
+        """
+        Peek at previous character in source.
+        """
+        return self.source[self.current - 1]
 
     def match(self, expected: str) -> bool:
         """
