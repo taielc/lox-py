@@ -3,15 +3,15 @@ Lox Interpreter base.
 """
 from typing import List
 
-from scanner import Scanner
+from scanner import ParsingError, Scanner
 from token_ import Token
 
 
-def run(source: str):
+def run(source: str, file_path=None):
     """
     Run Lox source code given.
     """
-    scanner = Scanner(source)
+    scanner = Scanner(source, file_path)
     tokens: List[Token] = scanner.scan_tokens()
     print(tokens)
 
@@ -19,17 +19,21 @@ def run(source: str):
 def run_file(path: str):
     """Run Lox from a given file path."""
     with open(path, mode="r", encoding="utf8") as file:
-        run(file.read())
+        run(file.read(), path)
 
 
 def run_prompt():
     """Run Lox as a prompt line by line."""
-    try:
-        while True:
+    while True:
+        try:
             run(input("> "))
-    except (EOFError, KeyboardInterrupt):
-        print("")
-        return
+        except KeyboardInterrupt:
+            print("")
+        except ParsingError as error:
+            print(error)
+        except EOFError:
+            print("")
+            return
 
 
 def main(args: List[str]):

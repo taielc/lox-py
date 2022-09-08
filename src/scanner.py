@@ -8,17 +8,35 @@ from token_type import KEYWORD_TOKENS, TokenType
 from utils import is_alpha, is_alphanumeric, is_digit
 
 
+class ParsingError(Exception):
+    """Parsing Error"""
+
+
 class Scanner:
     """
     Scanner for Lox.
     """
 
-    def __init__(self, source: str):
+    def __init__(self, source: str, file_path=None):
+        self.file = file_path if file_path is not None else "<stdin>"
         self.source = source
         self.tokens: List[Token] = []
         self.start = 0
         self.current = 0
         self.line = 1
+
+    def parsing_error(self, message: str):
+        """
+        Create a parsing error.
+        """
+        pos = (self.current - 1) - self.start
+        lines = [
+            f'File "{self.file}:{self.line}",',
+            self.source.split("\n")[self.line - 1],
+            " " * pos + "^",
+            " " * pos + f"Error: {message}",
+        ]
+        return ParsingError("\n".join(lines))
 
     def scan_tokens(self):
         """
@@ -101,7 +119,7 @@ class Scanner:
             case _ if is_alpha(char):
                 self.identifier_or_keyword()
             case _:
-                raise Exception(f"Unexpected character: {char}")
+                raise self.parsing_error(f"Unexpected character: {char}")
 
     def identifier_or_keyword(self):
         """
@@ -137,7 +155,7 @@ class Scanner:
                 self.line += 1
             self.advance()
         if self.is_at_end():
-            raise Exception("Unterminated string.")
+            raise self.parsing_error("Unterminated string.")
         # The closing "
         self.advance()
         # Skip the initial and ending "
